@@ -12,7 +12,7 @@ func main() {
 	envConfig := config.NewEnvConfig()
 	db := db.Init(envConfig, db.DBMigrator)
 	app := fiber.New(fiber.Config{
-		AppName:      "ticketBooking ",
+		AppName:      "ticketBooking",
 		ServerHeader: "fiber",
 	})
 

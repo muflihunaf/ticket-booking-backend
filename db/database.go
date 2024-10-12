@@ -12,8 +12,8 @@ import (
 
 func Init(config *config.EnvConfig, DBMigrator func(db *gorm.DB) error) *gorm.DB {
 	url := fmt.Sprintf(`
-		host=%s user=%s dbname=%s password=%s sslmode=%s port=5432
-	`, config.DBHost, config.DBUser, config.DBName, config.DBPassword, config.DBSSLMode)
+		host=%s user=%s dbname=%s password=%s sslmode=%s port=5432`,
+		config.DBHost, config.DBUser, config.DBName, config.DBPassword, config.DBSSLMode)
 
 	db, err := gorm.Open(postgres.Open(url), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Info),

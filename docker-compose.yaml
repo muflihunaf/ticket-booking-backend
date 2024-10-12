@@ -6,6 +6,7 @@ services:
     restart: always
     image: ticket-booking
     container_name: ticket-booking
+    build: .
     ports:
       - 3000:3000
     env_file:
@@ -38,4 +39,6 @@ services:
       timeout: 5s
       retries: 5
 networks:
+  application:
+volumes:
   postgres-db:

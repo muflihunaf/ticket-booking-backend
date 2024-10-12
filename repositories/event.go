@@ -28,7 +28,7 @@ func (r *EventRepository) CreateOne(ctx context.Context, event models.Event) (*m
 	return nil, nil
 }
 
-func NewEventRepository(db any) models.EventRepository {
+func NewEventRepository(db *gorm.DB) models.EventRepository {
 	return &EventRepository{
 		db: db,
 	}
