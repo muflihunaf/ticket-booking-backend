@@ -20,4 +20,5 @@ type EventRepository interface {
 	CreateOne(ctx context.Context, event *Event) (*Event, error)
 	UpdateOne(ctx context.Context, eventId uint, updateData map[string]interface{}) (*Event, error)
 	DeleteOne(ctx context.Context, eventId uint) error
+	FindByFilter(ctx context.Context, filter map[string]interface{}) ([]*Event, error)
 }

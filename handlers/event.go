@@ -13,6 +13,7 @@ type EventHandler struct {
 	repository models.EventRepository
 }
 
+// Event Handler
 func (h *EventHandler) GetMany(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()
@@ -35,7 +36,7 @@ func (h *EventHandler) GetOne(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()
 	event, err := h.repository.GetOne(context, uint(eventId))
-
+	// test
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"status":  "fail",
@@ -80,13 +81,21 @@ func (h *EventHandler) UpdateOne(ctx *fiber.Ctx) error {
 	context, cancel := context.WithTimeout(context.Background(), time.Duration(5*time.Second))
 	defer cancel()
 
-	event := &models.Event{}
+	// Convert Request
+	type updatedRequest struct {
+		Name string `json:"name"`
+	}
 
-	if err := ctx.BodyParser(event); err != nil {
+	var req updatedRequest
+	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"status":  "fail",
 			"message": err.Error(),
 		})
+	}
+
+	event := map[string]interface{}{
+		"name": req.Name,
 	}
 
 	updatedEvent, err := h.repository.UpdateOne(context, uint(eventId), event)
