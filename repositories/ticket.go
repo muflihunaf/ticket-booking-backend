@@ -51,7 +51,7 @@ func (r *TicketRepository) CreateOne(ctx context.Context, ticket *models.Ticket)
 func (r *TicketRepository) UpdateOne(ctx context.Context, ticketId uint, updateData map[string]interface{}) (*models.Ticket, error) {
 	ticket := &models.Ticket{}
 
-	res := r.db.Model(&models.Ticket{}).Where("id = ?", ticketId).Updates(updateData)
+	res := r.db.Model(ticket).Where("id = ?", ticketId).Updates(updateData)
 	if res.Error != nil {
 		return nil, res.Error
 	}

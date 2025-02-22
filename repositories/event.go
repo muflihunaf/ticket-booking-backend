@@ -42,7 +42,11 @@ func (r *EventRepository) CreateOne(ctx context.Context, event *models.Event) (*
 func (r *EventRepository) UpdateOne(ctx context.Context, eventId uint, updateData map[string]interface{}) (*models.Event, error) {
 	event := &models.Event{}
 
-	res := r.db.Model(&models.Event{}).Where("id = ?", eventId).Updates(updateData)
+	if err := r.db.Model(event).Where("id = ?", eventId).Updates(updateData).Error; err != nil {
+		return nil, err
+	}
+
+	res := r.db.Model(event).Where("id = ?", eventId).First(&event)
 	if res.Error != nil {
 		return nil, res.Error
 	}

@@ -55,12 +55,34 @@ func (h *EventHandler) CreateOne(ctx *fiber.Ctx) error {
 
 	event := &models.Event{}
 
-	if err := ctx.BodyParser(event); err != nil {
+	// Convert Request
+	type createdRequest struct {
+		Name     string `json:"name"`
+		Location string `json:"location"`
+		Date     string `json:"date"`
+	}
+	var req createdRequest
+
+	// Parse Request
+	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
 			"status":  "fail",
 			"message": err.Error(),
 		})
 	}
+
+	// Convert Request to Event
+	event.Name = req.Name
+	event.Location = req.Location
+	// parse date 2024-11-19 to time.Time
+	date, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"status":  "fail",
+			"message": err.Error(),
+		})
+	}
+	event.Date = date
 
 	createdEvent, err := h.repository.CreateOne(context, event)
 	if err != nil {
@@ -83,7 +105,9 @@ func (h *EventHandler) UpdateOne(ctx *fiber.Ctx) error {
 
 	// Convert Request
 	type updatedRequest struct {
-		Name string `json:"name"`
+		Name     string `json:"name"`
+		Location string `json:"location"`
+		Date     string `json:"date"`
 	}
 
 	var req updatedRequest
@@ -94,8 +118,18 @@ func (h *EventHandler) UpdateOne(ctx *fiber.Ctx) error {
 		})
 	}
 
+	// parse date 2024-11-19 to time.Time
+	date, err := time.Parse("2006-01-02", req.Date)
+	if err != nil {
+		return ctx.Status(fiber.StatusBadRequest).JSON(&fiber.Map{
+			"status":  "fail",
+			"message": err.Error(),
+		})
+	}
 	event := map[string]interface{}{
-		"name": req.Name,
+		"Name":     req.Name,
+		"Location": req.Location,
+		"Date":     date,
 	}
 
 	updatedEvent, err := h.repository.UpdateOne(context, uint(eventId), event)
