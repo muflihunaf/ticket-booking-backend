@@ -17,10 +17,11 @@ func main() {
 	})
 
 	eventRepository := repositories.NewEventRepository(db)
-
+	ticketRepository := repositories.NewTicketRepository(db)
 	server := app.Group("/api")
 
 	handlers.NewEventHandler(server.Group("/event"), eventRepository)
+	handlers.NewTicketHandler(server.Group("/ticket"), ticketRepository)
 
 	app.Listen(":" + envConfig.ServerPort)
 }
