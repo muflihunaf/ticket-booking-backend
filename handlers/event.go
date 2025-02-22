@@ -27,7 +27,7 @@ func (h *EventHandler) GetMany(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"status":  "success",
-		"message": "",
+		"message": "Events fetched successfully",
 		"data":    events,
 	})
 }
@@ -45,7 +45,7 @@ func (h *EventHandler) GetOne(ctx *fiber.Ctx) error {
 	}
 	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"status":  "success",
-		"message": "",
+		"message": "Event fetched successfully",
 		"data":    event,
 	})
 }
@@ -72,7 +72,7 @@ func (h *EventHandler) CreateOne(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"status":  "success",
-		"message": "",
+		"message": "Event created successfully",
 		"data":    createdEvent,
 	})
 }
@@ -108,7 +108,7 @@ func (h *EventHandler) UpdateOne(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"status":  "success",
-		"message": "",
+		"message": "Event updated successfully",
 		"data":    updatedEvent,
 	})
 }
@@ -128,7 +128,7 @@ func (h *EventHandler) DeleteOne(ctx *fiber.Ctx) error {
 
 	return ctx.Status(fiber.StatusOK).JSON(&fiber.Map{
 		"status":  "success",
-		"message": "",
+		"message": "Event deleted successfully",
 	})
 }
 
@@ -140,4 +140,6 @@ func NewEventHandler(router fiber.Router, repository models.EventRepository) {
 	router.Get("/", handler.GetMany)
 	router.Post("/", handler.CreateOne)
 	router.Get("/:eventId", handler.GetOne)
+	router.Put("/:eventId", handler.UpdateOne)
+	router.Delete("/:eventId", handler.DeleteOne)
 }

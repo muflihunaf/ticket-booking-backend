@@ -14,7 +14,7 @@ type EventRepository struct {
 func (r *EventRepository) GetMany(ctx context.Context) ([]*models.Event, error) {
 	event := []*models.Event{}
 
-	res := r.db.Model(&models.Event{}).Find(&event)
+	res := r.db.Model(&models.Event{}).Order("updated_at desc").Find(&event)
 	if res.Error != nil {
 		return nil, res.Error
 	}
