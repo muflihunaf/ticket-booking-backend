@@ -75,12 +75,23 @@ func (h *TicketHandler) CreateOne(ctx *fiber.Ctx) error {
 	defer cancel()
 
 	ticket := &models.Ticket{}
-	if err := ctx.BodyParser(ticket); err != nil {
+
+	// Parse Request
+	type createdRequest struct {
+		EventID uint `json:"eventId"`
+	}
+	var req createdRequest
+
+	if err := ctx.BodyParser(&req); err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid ticket data",
 			"status":  "error",
+			"error":   err.Error(),
 		})
 	}
+
+	// Create ticket
+	ticket.EventID = req.EventID
 
 	createdTicket, err := h.repository.CreateOne(context, ticket)
 	if err != nil {

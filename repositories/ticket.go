@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 
 	"github.com/muflihunaf/ticket-booking-v1/models"
 	"gorm.io/gorm"
@@ -31,7 +32,7 @@ func (r *TicketRepository) GetMany(ctx context.Context) ([]*models.Ticket, error
 func (r *TicketRepository) GetOne(ctx context.Context, ticketId uint) (*models.Ticket, error) {
 	ticket := &models.Ticket{}
 
-	res := r.db.Model(&models.Ticket{}).Preload("Event").Where("id = ?", ticketId).First(&ticket)
+	res := r.db.Model(ticket).Preload("Event").Where("id = ?", ticketId).First(&ticket)
 	if res.Error != nil {
 		return nil, res.Error
 	}
@@ -40,9 +41,18 @@ func (r *TicketRepository) GetOne(ctx context.Context, ticketId uint) (*models.T
 }
 
 func (r *TicketRepository) CreateOne(ctx context.Context, ticket *models.Ticket) (*models.Ticket, error) {
-	res := r.db.Model(&models.Ticket{}).Create(ticket)
-	if res.Error != nil {
-		return nil, res.Error
+	// Check if event exists
+	var exists bool
+	if err := r.db.Model(&models.Event{}).Select("count(*) > 0").Where("id = ?", ticket.EventID).Find(&exists).Error; err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, errors.New("event not found")
+	}
+
+	// Create ticket and preload event in a single step
+	if err := r.db.Create(ticket).Preload("Event").First(ticket, ticket.ID).Error; err != nil {
+		return nil, err
 	}
 
 	return ticket, nil
@@ -51,9 +61,14 @@ func (r *TicketRepository) CreateOne(ctx context.Context, ticket *models.Ticket)
 func (r *TicketRepository) UpdateOne(ctx context.Context, ticketId uint, updateData map[string]interface{}) (*models.Ticket, error) {
 	ticket := &models.Ticket{}
 
-	res := r.db.Model(ticket).Where("id = ?", ticketId).Updates(updateData)
-	if res.Error != nil {
-		return nil, res.Error
+	// Fetch the ticket and preload event
+	if err := r.db.Preload("Event").First(ticket, ticketId).Error; err != nil {
+		return nil, errors.New("ticket not found")
+	}
+
+	// Apply updates
+	if err := r.db.Model(ticket).Updates(updateData).Error; err != nil {
+		return nil, err
 	}
 
 	return ticket, nil

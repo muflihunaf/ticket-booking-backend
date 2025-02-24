@@ -54,7 +54,16 @@ func (r *EventRepository) UpdateOne(ctx context.Context, eventId uint, updateDat
 	return event, nil
 }
 func (r *EventRepository) DeleteOne(ctx context.Context, eventId uint) error {
-	res := r.db.Model(&models.Event{}).Where("id = ?", eventId).Delete(&models.Event{})
+
+	// Check if event exists
+	event := &models.Event{}
+	res := r.db.Model(event).Where("id = ?", eventId).First(&event)
+	if res.Error != nil {
+		return res.Error
+	}
+
+	// Delete event
+	res = r.db.Model(&models.Event{}).Where("id = ?", eventId).Delete(&models.Event{})
 	if res.Error != nil {
 		return res.Error
 	}
